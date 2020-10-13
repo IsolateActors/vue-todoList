@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="./js/remLayout.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="./css/style.css"/>
+	</head>
+	<body>
+		<div class="main">
+			<div class="header">
+				<div class="logo">ToDo</div>
+				<input type="text" id="input" placeholder="请输入代办事项">
+			</div>
+			
+			<div class="doing todo">
+				<h3><span class="title">正在运行</span><span class="num">0</span></h3>
+				<div class="list">
+					<!-- <div class="todoItem">
+						<input type="checkbox">
+						<div class="content">今晚吃鸡</div>
+						<div class="del">删除</div>
+					</div> -->
+				</div>
+			</div>
+			
+			<div class="done todo">
+				<h3><span class="title">正在运行</span><span class="num">0</span></h3>
+				<div class="list">
+					<!-- <div class="todoItem">
+						<input type="checkbox" checked="checked">
+						<div class="content">今晚吃鸡</div>
+						<div class="del">删除</div>
+					</div> -->
+				</div>
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+			
+			
+			var doingListDiv = document.querySelector('.doing .list');
+			var doneListDiv = document.querySelector(".done .list");
+			var doingListNum = document.querySelector('.doing .num');
+			var doneListNum = document.querySelector(".done .num");
+			
+			var mainDiv = document.querySelector(".main");
+			
+			if(localStorage.todoList == undefined){
+				var todoList = [];
+			}
+			else{
+				var todoList = JSON.parse(localStorage.todoList);
+			}
+			render(todoList);
+			
+			var inputDom = document.querySelector("#input");
+			inputDom.onkeydown = function(event){
+				// console.log(event)
+				if(event.key == "Enter"){
+					// console.log(event);
+					var value = inputDom.value;
+					var objItem = {
+						content: value,
+						isDone: false
+					}
+					todoList.push(objItem);
+					console.log(todoList)
+					
+					render(todoList);
+				}
+			}
+			
+			
+			function render(todoList){
+				
+				
+				localStorage.todoList = JSON.stringify(todoList); 
+				
+				doingListDiv.innerHTML = "";
+				doneListDiv.innerHTML = "";
+				var doingLen = 0;
+				var doneLen = 0;
+				
+				todoList.forEach(function(item, index){
+					var todoItem = document.createElement("div");
+					todoItem.className = "todoItem";
+					if(item.isDone){
+						todoItem.innerHTML = `
+						<input type="checkbox" checked="checked" data-index="${index}">
+						<div class="content">`+ item.content +`</div>
+						<div class="del">删除</div>`;
+						doneListDiv.appendChild(todoItem);
+						doneLen++;
+					}else{
+						todoItem.innerHTML = `
+						<input type="checkbox" data-index="${index}">
+						<div class="content">`+ item.content +`</div>
+						<div class="del" data-index="${index}">删除</div>`;
+						doingListDiv.appendChild(todoItem);
+						doingLen++;
+					}
+				});
+				
+				doingListNum.innerText = doingLen;
+				doneListNum.innerText = doneLen;
+			}
+			
+			doingListDiv.onchange = function(e){
+				console.log(e)
+				var index = parseInt(e.target.dataset.index);
+				console.log(index)
+				todoList[index].isDone = true;
+				render(todoList);
+			}
+			
+			doneListDiv.onchange = function(e){
+				console.log(e)
+				var index = parseInt(e.target.dataset.index);
+				console.log(index)
+				todoList[index].isDone = false;
+				render(todoList);
+			}
+			
+			mainDiv.onclick = function(e){
+				if(e.target.className == 'del'){
+					var index = parseInt(e.target.dataset.index);
+					todoList.splice(index,1);
+					render(todoList)
+				}
+				
+			}
+		</script>
+	</body>
+</html>
